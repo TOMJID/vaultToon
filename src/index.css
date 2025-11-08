@@ -314,7 +314,4 @@
   animation: fadeInLeft 0.5s ease-out forwards;
 }
 
-/* Smooth transitions for all elements */
-* {
-  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
-}
+
