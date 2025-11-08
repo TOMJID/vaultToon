@@ -35,7 +35,7 @@
     @apply text-2xl font-bold text-white sm:text-3xl;
   }
 
-  main {
+  body {
     @apply bg-primary relative min-h-screen;
   }
 
