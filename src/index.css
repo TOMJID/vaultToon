@@ -314,4 +314,11 @@
   animation: fadeInLeft 0.5s ease-out forwards;
 }
 
+/* Navbar blur effect */
+.navbar-blur {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  background-color: rgba(3, 0, 20, 0.5);
+}
+
 

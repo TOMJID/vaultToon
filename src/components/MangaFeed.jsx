@@ -39,7 +39,7 @@ const LatestMangaFeed = ({ searchTerm = "" }) => {
     );
     const fileName = coverRel?.attributes?.fileName;
     if (!fileName) return null;
-    const base = `https://uploads.mangadex.org/covers/${manga.id}/${fileName}`;
+    const base = `/api/covers/${manga.id}/${fileName}`;
     return {
       src: `${base}.256.jpg`,
       srcSet: `${base}.256.jpg 1x, ${base}.512.jpg 2x`,

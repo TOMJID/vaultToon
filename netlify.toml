@@ -14,6 +14,12 @@
   status = 200
   force = true
 
+[[redirects]]
+  from = "/api/covers/*"
+  to = "/.netlify/functions/coverImage"
+  status = 200
+  force = true
+
 [functions]
   node_bundler = "esbuild"
 

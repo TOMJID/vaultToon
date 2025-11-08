@@ -76,7 +76,7 @@ const MangaDetail = () => {
     );
     const fileName = coverRel?.attributes?.fileName;
     if (!fileName) return null;
-    const base = `https://uploads.mangadex.org/covers/${manga.id}/${fileName}`;
+    const base = `/api/covers/${manga.id}/${fileName}`;
     return `${base}.512.jpg`;
   };
 

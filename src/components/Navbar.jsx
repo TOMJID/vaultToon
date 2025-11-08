@@ -14,7 +14,7 @@ const Navbar = () => {
     <nav
       className={`animate-fade-in-down fixed top-0 left-0 z-50 -ms-2 w-auto transition-all duration-300`}
     >
-      <div className="bg-primary/50 m-2 flex w-64 items-center justify-start rounded-r-2xl px-5 py-4 backdrop-blur-2xl">
+      <div className="navbar-blur m-2 flex w-64 items-center justify-start rounded-r-2xl px-5 py-4 border border-white/10">
         <button
           onClick={handleLogoClick}
           className="group relative flex items-center gap-3 whitespace-nowrap transition-all duration-300 hover:scale-105 active:scale-95"
