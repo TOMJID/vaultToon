@@ -1,5 +1,7 @@
 import { useState } from "react";
 import Search from "./components/Search";
+import MangaFeed from "./components/MangaFeed";
+import LatestMangaFeed from "./components/MangaFeed";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,6 +18,7 @@ function App() {
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           <h1> {searchTerm} </h1>
         </div>
+      <LatestMangaFeed />
       </div>
     </main>
   );
