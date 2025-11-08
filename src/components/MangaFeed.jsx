@@ -78,7 +78,7 @@ const LatestMangaFeed = ({ searchTerm = "" }) => {
           params["order[latestUploadedChapter]"] = "desc";
         }
 
-        const resp = await axios.get("https://api.mangadex.org/manga", {
+        const resp = await axios.get("/api/manga", {
           params,
           cancelToken: cancelRef.current.token,
         });

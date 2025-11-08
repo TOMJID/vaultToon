@@ -1,0 +1,19 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/api/manga"
+  to = "/.netlify/functions/manga"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/manga/:id"
+  to = "/.netlify/functions/mangaDetail?id=:id"
+  status = 200
+  force = true
+
+[functions]
+  node_bundler = "esbuild"
+

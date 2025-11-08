@@ -12,4 +12,16 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://api.mangadex.org",
+        changeOrigin: true,
+        rewrite: (path) => {
+          // Rewrite /api/manga to /manga and /api/manga/:id to /manga/:id
+          return path.replace(/^\/api/, "");
+        },
+      },
+    },
+  },
 });

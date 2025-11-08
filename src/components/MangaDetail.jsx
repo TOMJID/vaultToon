@@ -16,7 +16,7 @@ const MangaDetail = () => {
       setError("");
 
       try {
-        const resp = await axios.get(`https://api.mangadex.org/manga/${id}`, {
+        const resp = await axios.get(`/api/manga/${id}`, {
           params: {
             "includes[]": [
               "cover_art",
@@ -103,13 +103,13 @@ const MangaDetail = () => {
 
   if (error || !manga) {
     return (
-      <div className="min-h-screen p-4 sm:p-6 bg-transparent">
+      <div className="min-h-screen bg-transparent p-4 sm:p-6">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 animate-fade-in-up">
+          <div className="animate-fade-in-up mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
             <span>{error || "Manga not found"}</span>
             <button
               onClick={() => navigate(-1)}
-              className="rounded-md bg-red-600 px-3 py-1 text-white hover:bg-red-700 transition-all duration-300 hover:scale-105 active:scale-95"
+              className="rounded-md bg-red-600 px-3 py-1 text-white transition-all duration-300 hover:scale-105 hover:bg-red-700 active:scale-95"
             >
               Go Back
             </button>
@@ -132,12 +132,12 @@ const MangaDetail = () => {
   const publicationDemographic = attributes?.publicationDemographic || "";
 
   return (
-    <div className="min-h-screen bg-transparent p-4 sm:p-6 animate-fade-in">
+    <div className="animate-fade-in min-h-screen bg-transparent p-4 sm:p-6">
       <div className="mx-auto max-w-6xl">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="mb-6 flex items-center gap-2 text-light-200 hover:text-white transition-all duration-300 hover:translate-x-[-4px] hover:scale-105 active:scale-95 group animate-fade-in"
+          className="text-light-200 group animate-fade-in mb-6 flex items-center gap-2 transition-all duration-300 hover:translate-x-[-4px] hover:scale-105 hover:text-white active:scale-95"
         >
           <svg
             className="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1"
@@ -158,9 +158,9 @@ const MangaDetail = () => {
         {/* Main Content */}
         <div className="grid gap-6 md:grid-cols-[300px_1fr] lg:grid-cols-[400px_1fr]">
           {/* Cover Image */}
-          <div className="flex flex-col animate-slide-in-left">
+          <div className="animate-slide-in-left flex flex-col">
             <div className="sticky top-6">
-              <div className="overflow-hidden rounded-xl border-2 border-light-100/20 shadow-2xl transition-all duration-500 hover:shadow-purple-500/30 hover:scale-[1.02] group/cover">
+              <div className="border-light-100/20 group/cover overflow-hidden rounded-xl border-2 shadow-2xl transition-all duration-500 hover:scale-[1.02] hover:shadow-purple-500/30">
                 {coverUrl ? (
                   <img
                     src={coverUrl}
@@ -177,7 +177,7 @@ const MangaDetail = () => {
                 href={`https://mangadex.org/title/${id}`}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-light-100/10 px-4 py-3 text-white transition hover:bg-light-100/20"
+                className="bg-light-100/10 hover:bg-light-100/20 mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-white transition"
               >
                 <span>View on MangaDex</span>
                 <svg
@@ -198,10 +198,10 @@ const MangaDetail = () => {
           </div>
 
           {/* Details */}
-          <div className="flex flex-col gap-6 animate-slide-in-right">
+          <div className="animate-slide-in-right flex flex-col gap-6">
             {/* Title */}
             <div>
-              <h1 className="mb-2 text-4xl font-bold text-white sm:text-5xl transition-all duration-300 hover:text-light-100">
+              <h1 className="hover:text-light-100 mb-2 text-4xl font-bold text-white transition-all duration-300 sm:text-5xl">
                 {title}
               </h1>
               {attributes?.altTitles && attributes.altTitles.length > 0 && (
@@ -218,27 +218,27 @@ const MangaDetail = () => {
             {/* Meta Information */}
             <div className="flex flex-wrap gap-3">
               {status && (
-                <span className="rounded-lg bg-light-100/10 px-3 py-1.5 text-sm text-white transition-all duration-300 hover:bg-light-100/20 hover:scale-110 cursor-default animate-fade-in-scale">
+                <span className="bg-light-100/10 hover:bg-light-100/20 animate-fade-in-scale cursor-default rounded-lg px-3 py-1.5 text-sm text-white transition-all duration-300 hover:scale-110">
                   {status}
                 </span>
               )}
               {year !== "Unknown" && (
-                <span className="rounded-lg bg-light-100/10 px-3 py-1.5 text-sm text-white transition-all duration-300 hover:bg-light-100/20 hover:scale-110 cursor-default animate-fade-in-scale">
+                <span className="bg-light-100/10 hover:bg-light-100/20 animate-fade-in-scale cursor-default rounded-lg px-3 py-1.5 text-sm text-white transition-all duration-300 hover:scale-110">
                   {year}
                 </span>
               )}
               {contentRating && (
-                <span className="rounded-lg bg-light-100/10 px-3 py-1.5 text-sm text-white capitalize transition-all duration-300 hover:bg-light-100/20 hover:scale-110 cursor-default animate-fade-in-scale">
+                <span className="bg-light-100/10 hover:bg-light-100/20 animate-fade-in-scale cursor-default rounded-lg px-3 py-1.5 text-sm text-white capitalize transition-all duration-300 hover:scale-110">
                   {contentRating}
                 </span>
               )}
               {publicationDemographic && (
-                <span className="rounded-lg bg-light-100/10 px-3 py-1.5 text-sm text-white capitalize transition-all duration-300 hover:bg-light-100/20 hover:scale-110 cursor-default animate-fade-in-scale">
+                <span className="bg-light-100/10 hover:bg-light-100/20 animate-fade-in-scale cursor-default rounded-lg px-3 py-1.5 text-sm text-white capitalize transition-all duration-300 hover:scale-110">
                   {publicationDemographic}
                 </span>
               )}
               {originalLanguage && (
-                <span className="rounded-lg bg-light-100/10 px-3 py-1.5 text-sm text-white uppercase transition-all duration-300 hover:bg-light-100/20 hover:scale-110 cursor-default animate-fade-in-scale">
+                <span className="bg-light-100/10 hover:bg-light-100/20 animate-fade-in-scale cursor-default rounded-lg px-3 py-1.5 text-sm text-white uppercase transition-all duration-300 hover:scale-110">
                   {originalLanguage}
                 </span>
               )}
@@ -246,9 +246,7 @@ const MangaDetail = () => {
 
             {/* Authors */}
             <div>
-              <h3 className="mb-2 text-lg font-semibold text-white">
-                Authors
-              </h3>
+              <h3 className="mb-2 text-lg font-semibold text-white">Authors</h3>
               <p className="text-light-200">{authors}</p>
             </div>
 
@@ -257,7 +255,7 @@ const MangaDetail = () => {
               <h3 className="mb-2 text-lg font-semibold text-white">
                 Description
               </h3>
-              <p className="whitespace-pre-wrap text-gray-300 leading-relaxed">
+              <p className="leading-relaxed whitespace-pre-wrap text-gray-300">
                 {description}
               </p>
             </div>
@@ -276,11 +274,11 @@ const MangaDetail = () => {
                     return (
                       <span
                         key={tag.id}
-                        className="rounded-lg bg-light-100/10 px-3 py-1.5 text-sm text-light-200 transition-all duration-300 hover:bg-light-100/20 hover:scale-110 cursor-default animate-fade-in-scale"
+                        className="bg-light-100/10 text-light-200 hover:bg-light-100/20 animate-fade-in-scale cursor-default rounded-lg px-3 py-1.5 text-sm transition-all duration-300 hover:scale-110"
                         style={{
                           animationDelay: `${index * 0.05}s`,
                           opacity: 0,
-                          animationFillMode: 'forwards'
+                          animationFillMode: "forwards",
                         }}
                       >
                         {tagName}
@@ -338,4 +336,3 @@ const MangaDetail = () => {
 };
 
 export default MangaDetail;
-
