@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import axios from "axios";
+import Spinner from "./Spinner";
 
 const LIMIT = 30; // keep limit and offset in sync
 
@@ -162,86 +163,90 @@ const LatestMangaFeed = () => {
         </div>
       )}
 
-      <div
-        className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-        aria-live="polite"
-      >
-        {mangaList.map((manga) => {
-          const { id, attributes } = manga;
-          const cover = getCoverUrl(manga);
-          const title = buildTitle(attributes);
-          const year = attributes?.year || "Unknown";
-          const status = attributes?.status || "";
-          const contentRating = attributes?.contentRating || "";
+      {loading && mangaList.length === 0 ? (
+        <Spinner />
+      ) : (
+        <div
+          className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+          aria-live="polite"
+        >
+          {mangaList.map((manga) => {
+            const { id, attributes } = manga;
+            const cover = getCoverUrl(manga);
+            const title = buildTitle(attributes);
+            const year = attributes?.year || "Unknown";
+            const status = attributes?.status || "";
+            const contentRating = attributes?.contentRating || "";
 
-          return (
-            <a
-              key={id}
-              // href={`https://mangadex.org/title/${id}`}
-              target="_blank"
-              rel="noreferrer"
-              className="group relative block overflow-hidden rounded-xl border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
-            >
-              <div className="relative aspect-[2/3] w-full bg-gray-100">
-                {cover ? (
-                  <img
-                    src={cover.src}
-                    srcSet={cover.srcSet}
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
-                    alt={title}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-                  />
-                ) : (
-                  <div className="h-full w-full animate-pulse bg-gray-200" />
-                )}
+            return (
+              <a
+                key={id}
+                href={`https://mangadex.org/title/${id}`}
+                target="_blank"
+                rel="noreferrer"
+                className="group relative block overflow-hidden rounded-xl border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
+              >
+                <div className="relative aspect-[2/3] w-full bg-gray-100">
+                  {cover ? (
+                    <img
+                      src={cover.src}
+                      srcSet={cover.srcSet}
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
+                      alt={title}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                    />
+                  ) : (
+                    <div className="h-full w-full animate-pulse bg-gray-200" />
+                  )}
 
-                {/* Gradient overlay */}
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent opacity-90" />
+                  {/* Gradient overlay */}
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent opacity-90" />
 
-                {/* Title + meta */}
-                <div className="absolute inset-x-0 bottom-0 p-2 text-white">
-                  <h3 className="line-clamp-2 text-sm font-semibold drop-shadow-md">
-                    {title}
-                  </h3>
-                  <div className="mt-1 flex items-center gap-2 text-[11px] opacity-90">
-                    <span>{year}</span>
-                    {status && (
-                      <span className="rounded bg-white/15 px-1.5 py-0.5">
-                        {status}
-                      </span>
-                    )}
-                    {contentRating && (
-                      <span className="rounded bg-white/15 px-1.5 py-0.5">
-                        {contentRating}
-                      </span>
-                    )}
+                  {/* Title + meta */}
+                  <div className="absolute inset-x-0 bottom-0 p-2 text-white">
+                    <h3 className="line-clamp-2 text-sm font-semibold drop-shadow-md">
+                      {title}
+                    </h3>
+                    <div className="mt-1 flex items-center gap-2 text-[11px] opacity-90">
+                      <span>{year}</span>
+                      {status && (
+                        <span className="rounded bg-white/15 px-1.5 py-0.5">
+                          {status}
+                        </span>
+                      )}
+                      {contentRating && (
+                        <span className="rounded bg-white/15 px-1.5 py-0.5">
+                          {contentRating}
+                        </span>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Hover CTA */}
+                  <div className="pointer-events-none absolute inset-0 hidden items-center justify-center backdrop-blur-[2px] group-hover:flex"></div>
                 </div>
+              </a>
+            );
+          })}
 
-                {/* Hover CTA */}
-                <div className="pointer-events-none absolute inset-0 hidden items-center justify-center backdrop-blur-[2px] group-hover:flex"></div>
+          {/* Skeletons while loading */}
+          {loading &&
+            Array.from({ length: 6 }).map((_, idx) => (
+              <div
+                key={`skeleton-${idx}`}
+                className="overflow-hidden rounded-xl border bg-white"
+              >
+                <div className="aspect-[2/3] w-full animate-pulse bg-gray-200" />
+                <div className="p-3">
+                  <div className="mb-2 h-3 w-3/4 animate-pulse rounded bg-gray-200" />
+                  <div className="h-3 w-1/3 animate-pulse rounded bg-gray-200" />
+                </div>
               </div>
-            </a>
-          );
-        })}
-
-        {/* Skeletons while loading */}
-        {loading &&
-          Array.from({ length: 6 }).map((_, idx) => (
-            <div
-              key={`skeleton-${idx}`}
-              className="overflow-hidden rounded-xl border bg-white"
-            >
-              <div className="aspect-[2/3] w-full animate-pulse bg-gray-200" />
-              <div className="p-3">
-                <div className="mb-2 h-3 w-3/4 animate-pulse rounded bg-gray-200" />
-                <div className="h-3 w-1/3 animate-pulse rounded bg-gray-200" />
-              </div>
-            </div>
-          ))}
-      </div>
+            ))}
+        </div>
+      )}
 
       {/* Status + sentinel */}
       <div className="py-4">

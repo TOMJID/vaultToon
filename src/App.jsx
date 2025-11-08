@@ -18,7 +18,7 @@ function App() {
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           <h1> {searchTerm} </h1>
         </div>
-      <LatestMangaFeed />
+        <LatestMangaFeed />
       </div>
     </main>
   );
