@@ -18,13 +18,13 @@ function Home() {
   }, [searchTerm]);
 
   return (
-    <main>
+    <main className="animate-fade-in">
       <div className="pattern">
         <div className="wrapper">
           <header>
-            <img src="./hero.png" alt="hero banner" />
-            <h1>
-              Find <span className="text-gradient">Manga</span> You'll Enjoy
+            <img src="./hero.png" alt="hero banner" className="animate-float" />
+            <h1 className="transition-all duration-500 hover:scale-105">
+              Find <span className="text-gradient animate-pulse-glow">Manga</span> You'll Enjoy
             </h1>
           </header>
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
