@@ -1,6 +1,6 @@
-const axios = require("axios");
+import axios from "axios";
 
-exports.handler = async (event, context) => {
+export const handler = async (event) => {
   // Handle CORS preflight
   if (event.httpMethod === "OPTIONS") {
     return {

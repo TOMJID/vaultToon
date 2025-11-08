@@ -1,6 +1,6 @@
-const axios = require("axios");
+import axios from "axios";
 
-exports.handler = async (event, context) => {
+export const handler = async (event) => {
   // Handle CORS preflight
   if (event.httpMethod === "OPTIONS") {
     return {
@@ -16,28 +16,64 @@ exports.handler = async (event, context) => {
 
   try {
     // Extract path from the request
-    // The path will be like: /api/covers/{mangaId}/{filename}.{size}.jpg
-    // or /.netlify/functions/coverImage (after redirect)
-    let requestPath = event.path || event.rawPath || "";
+    // Try multiple sources for the original path
+    let rawPath = event.rawPath || event.path || "";
     
-    // Get the original path from headers if available (Netlify preserves this)
-    const originalPath = event.headers?.["x-path"] || 
-                        event.headers?.["x-original-path"] ||
-                        event.headers?.["X-Path"] ||
-                        event.headers?.["X-Original-Path"] ||
-                        requestPath;
-
+    // Check if we can get the original URL from headers
+    const referer = event.headers?.["referer"] || event.headers?.["Referer"] || "";
+    const host = event.headers?.["host"] || event.headers?.["Host"] || "";
+    const xForwardedPath = event.headers?.["x-forwarded-path"] || event.headers?.["X-Forwarded-Path"] || "";
+    
+    // If we have a referer, try to extract the path from it
+    if (!rawPath || rawPath === "/.netlify/functions/coverImage") {
+      if (xForwardedPath) {
+        rawPath = xForwardedPath;
+      } else if (referer) {
+        try {
+          const url = new URL(referer);
+          rawPath = url.pathname;
+        } catch (e) {
+          // Ignore URL parsing errors
+        }
+      }
+    }
+    
+    // The rawPath should contain the original request path like: /api/covers/{mangaId}/{filename}.{size}.jpg
     // Try to extract mangaId and filename from the path
-    // Pattern: /api/covers/{mangaId}/{filename}.{size}.jpg
-    let pathMatch = originalPath.match(/\/covers\/([^\/]+)\/(.+)$/);
+    let pathMatch = rawPath.match(/\/api\/covers\/([^\/]+)\/(.+)$/);
     
-    // If no match, try without /api prefix
+    // If no match, try without /api prefix (in case rawPath doesn't include it)
     if (!pathMatch) {
-      pathMatch = originalPath.match(/covers\/([^\/]+)\/(.+)$/);
+      pathMatch = rawPath.match(/\/covers\/([^\/]+)\/(.+)$/);
+    }
+    
+    // If still no match, try to get from query string (fallback)
+    if (!pathMatch && event.queryStringParameters) {
+      const mangaId = event.queryStringParameters.mangaId;
+      const filename = event.queryStringParameters.filename;
+      if (mangaId && filename) {
+        pathMatch = [null, mangaId, filename];
+      }
+    }
+    
+    // Last resort: check if path info is in the request context
+    if (!pathMatch && event.requestContext) {
+      const path = event.requestContext.path || event.requestContext.http?.path;
+      if (path) {
+        pathMatch = path.match(/\/api\/covers\/([^\/]+)\/(.+)$/) || 
+                   path.match(/\/covers\/([^\/]+)\/(.+)$/);
+      }
     }
 
     if (!pathMatch) {
-      console.error("Could not extract path parameters. Original path:", originalPath, "Event path:", requestPath);
+      // Log for debugging
+      console.error("Could not extract path parameters.", {
+        rawPath: event.rawPath,
+        path: event.path,
+        queryStringParameters: event.queryStringParameters,
+        headers: event.headers ? Object.keys(event.headers) : null
+      });
+      
       return {
         statusCode: 400,
         headers: {
@@ -46,13 +82,19 @@ exports.handler = async (event, context) => {
         },
         body: JSON.stringify({ 
           error: "Invalid cover image path",
-          debug: { originalPath, requestPath, headers: event.headers }
+          debug: { 
+            rawPath: event.rawPath, 
+            path: event.path,
+            queryStringParameters: event.queryStringParameters
+          }
         }),
       };
     }
 
     const [, mangaId, filename] = pathMatch;
     const imageUrl = `https://uploads.mangadex.org/covers/${mangaId}/${filename}`;
+    
+    console.log("Fetching image:", imageUrl, "from path:", rawPath);
 
     // Fetch the image from MangaDex
     const response = await axios.get(imageUrl, {
