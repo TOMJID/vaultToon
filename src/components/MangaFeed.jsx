@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { Link } from "react-router";
 import axios from "axios";
 import Spinner from "./Spinner";
 
 const LIMIT = 30; // keep limit and offset in sync
 
-const LatestMangaFeed = () => {
+const LatestMangaFeed = ({ searchTerm = "" }) => {
   const [mangaList, setMangaList] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -59,19 +60,22 @@ const LatestMangaFeed = () => {
     cancelRef.current = axios.CancelToken.source();
 
     try {
+      const params = {
+        limit: LIMIT,
+        offset: (pageNum - 1) * LIMIT,
+        "includes[]": ["cover_art"],
+      };
+
+      // If there's a search term, use search API, otherwise use latest feed
+      if (searchTerm.trim()) {
+        params.title = searchTerm.trim();
+        params["order[relevance]"] = "desc";
+      } else {
+        params["order[latestUploadedChapter]"] = "desc";
+      }
+
       const resp = await axios.get("https://api.mangadex.org/manga", {
-        params: {
-          limit: LIMIT,
-          offset: (pageNum - 1) * LIMIT,
-          // "Latest" = recently updated series (newest uploaded chapter first)
-          "order[latestUploadedChapter]": "desc",
-          // If you meant newly created titles instead, use:
-          // "order[createdAt]": "desc",
-          // Include related cover art so we can build image URLs
-          "includes[]": ["cover_art"],
-          // Optional: content filter example
-          // "contentRating[]": ["safe", "suggestive"],
-        },
+        params,
         cancelToken: cancelRef.current.token,
       });
 
@@ -99,9 +103,15 @@ const LatestMangaFeed = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [searchTerm]);
 
-  // Fetch when page changes
+  // Reset to page 1 when search term changes
+  useEffect(() => {
+    setPage(1);
+    setMangaList([]);
+  }, [searchTerm]);
+
+  // Fetch when page or search term changes
   useEffect(() => {
     fetchLatestManga(page);
     return () => {
@@ -140,11 +150,13 @@ const LatestMangaFeed = () => {
     <section className="min-h-screen p-4 sm:p-6">
       <header className="mb-5 flex flex-row items-center justify-center gap-2 sm:mb-6">
         <div>
-          <h2 className="font- text-center text-3xl font-bold">Manga feed</h2>
+          <h2 className="font- text-center text-3xl font-bold">
+            {searchTerm.trim() ? `Search Results for "${searchTerm}"` : "Manga feed"}
+          </h2>
           <p className="text-center text-sm text-gray-500 sm:text-left">
             {total !== null && (
               <>
-                current loaded {mangaList.length} out of {total}
+                {searchTerm.trim() ? "Found" : "current loaded"} {mangaList.length} out of {total}
               </>
             )}
           </p>
@@ -179,11 +191,9 @@ const LatestMangaFeed = () => {
             const contentRating = attributes?.contentRating || "";
 
             return (
-              <a
+              <Link
                 key={id}
-                href={`https://mangadex.org/title/${id}`}
-                target="_blank"
-                rel="noreferrer"
+                to={`/manga/${id}`}
                 className="group relative block overflow-hidden rounded-xl border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
               >
                 <div className="relative aspect-[2/3] w-full bg-gray-100">
@@ -227,7 +237,7 @@ const LatestMangaFeed = () => {
                   {/* Hover CTA */}
                   <div className="pointer-events-none absolute inset-0 hidden items-center justify-center backdrop-blur-[2px] group-hover:flex"></div>
                 </div>
-              </a>
+              </Link>
             );
           })}
 
