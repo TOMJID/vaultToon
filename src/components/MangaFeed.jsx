@@ -14,6 +14,7 @@ const LatestMangaFeed = ({ searchTerm = "" }) => {
   const [total, setTotal] = useState(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [previousMangaCount, setPreviousMangaCount] = useState(0);
+  const [retryCount, setRetryCount] = useState(0);
 
   const observerRef = useRef(null);
   const cancelRef = useRef(null);
@@ -82,6 +83,9 @@ const LatestMangaFeed = ({ searchTerm = "" }) => {
           cancelToken: cancelRef.current.token,
         });
 
+        // If successful, reset retry count
+        setRetryCount(0);
+
         const api = resp.data || {};
         const newManga = api.data || [];
         const apiTotal = typeof api.total === "number" ? api.total : null;
@@ -111,12 +115,13 @@ const LatestMangaFeed = ({ searchTerm = "" }) => {
         if (!axios.isCancel(err)) {
           console.error("Error fetching MangaDex feed:", err);
           setError("Failed to load manga feed.");
+          setRetryCount((prev) => prev + 1);
         }
       } finally {
         setLoading(false);
       }
     },
-    [searchTerm],
+    [searchTerm, setRetryCount],
   );
 
   // Reset to page 1 when search term changes
@@ -125,6 +130,7 @@ const LatestMangaFeed = ({ searchTerm = "" }) => {
     setMangaList([]);
     setIsInitialLoad(true);
     setPreviousMangaCount(0);
+    setRetryCount(0); // Reset retry count on new search
   }, [searchTerm]);
 
   // Fetch when page or search term changes
@@ -157,9 +163,21 @@ const LatestMangaFeed = ({ searchTerm = "" }) => {
     return () => observer.unobserve(sentinel);
   }, [hasMore, loading]);
 
+  const MAX_RETRIES = 3;
+
   const retry = () => {
-    setError("");
-    fetchLatestManga(page);
+    if (retryCount < MAX_RETRIES) {
+      setError(""); // Clear previous error message
+      // Add a delay before retrying
+      setTimeout(() => {
+        fetchLatestManga(page);
+      }, 2000); // 2-second delay
+      setError(`Retrying... Attempt ${retryCount + 1} of ${MAX_RETRIES}`);
+    } else {
+      setError(
+        "Failed to load manga feed after multiple attempts. Please try again later.",
+      );
+    }
   };
 
   return (
